@@ -1,6 +1,6 @@
 {
   "name": "@kiliantrunk/polymarket-mcp",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Polymarket Analysis Bot — MCP server for DKG V10. Analyzes markets for coordination patterns and market manipulation, ingests findings into DKG Working Memory.",
   "type": "module",
   "main": "dist/index.js",
