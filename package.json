@@ -1,0 +1,60 @@
+{
+  "name": "@umanitek/polymarket-mcp",
+  "version": "1.0.0",
+  "description": "Polymarket Analysis Bot — MCP server for DKG V10. Analyzes markets for coordination patterns and market manipulation, ingests findings into DKG Working Memory.",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "bin": {
+    "polymarket-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc && node dist/index.js",
+    "test": "node --test",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "dkg",
+    "decentralized-knowledge-graph",
+    "mcp",
+    "model-context-protocol",
+    "polymarket",
+    "market-analysis",
+    "coordination-detection"
+  ],
+  "author": {
+    "name": "Umanitek",
+    "email": "info@umanitek.io"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KilianTrunk/polymarket-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/KilianTrunk/polymarket-mcp/issues"
+  },
+  "homepage": "https://github.com/KilianTrunk/polymarket-mcp#readme"
+}
