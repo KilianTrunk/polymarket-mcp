@@ -10,19 +10,20 @@ export interface AnalysisRequest {
 export interface AnalysisResponse {
   market_id: string;
   market_url: string;
-  risk_score: number;
-  suspicious_comment_count: number;
-  suspicious_comments: Array<{
+  analysis?: Record<string, any>;
+  risk_score?: number;
+  suspicious_comment_count?: number;
+  suspicious_comments?: Array<{
     author: string;
     text: string;
     likes: number;
   }>;
-  market_movers: Array<{
+  market_movers?: Array<{
     address: string;
     balance: string;
     position: string;
   }>;
-  lunarcrush_overlap: {
+  lunarcrush_overlap?: {
     mentioned_creators: string[];
     amplification_score: number;
   };

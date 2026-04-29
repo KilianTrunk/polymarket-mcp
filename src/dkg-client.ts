@@ -40,6 +40,19 @@ function iriPart(value: string): string {
 }
 
 function contentToQuads(subject: string, content: Record<string, any>): Quad[] {
+  const graphQuads = content.dkgGraphQuads;
+  if (Array.isArray(graphQuads)) {
+    const quads = graphQuads.flatMap((quad): Quad[] => {
+      if (!quad || typeof quad !== 'object') return [];
+      const { subject, predicate, object } = quad as Record<string, unknown>;
+      if (typeof subject !== 'string' || typeof predicate !== 'string' || typeof object !== 'string') {
+        return [];
+      }
+      return [{ subject, predicate, object, graph: '' }];
+    });
+    if (quads.length > 0) return quads;
+  }
+
   const quads: Quad[] = [
     {
       subject,
@@ -49,7 +62,7 @@ function contentToQuads(subject: string, content: Record<string, any>): Quad[] {
     },
   ];
 
-  const skipKeys = new Set(['@context', '@id', '@type']);
+  const skipKeys = new Set(['@context', '@id', '@type', 'dkgGraphQuads']);
   for (const [key, value] of Object.entries(content)) {
     if (skipKeys.has(key) || value === undefined || value === null) continue;
     quads.push({

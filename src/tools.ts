@@ -10,6 +10,16 @@ import { PolymarketClient, AnalysisResponse } from './polymarket-client.js';
 const dkg = new DkgClient();
 const polymarket = new PolymarketClient();
 
+function reportFromAnalysis(analysis: AnalysisResponse): Record<string, any> {
+  return analysis.analysis && typeof analysis.analysis === 'object' ? analysis.analysis : analysis as any;
+}
+
+function graphQuadsFromReport(report: Record<string, any>): unknown[] {
+  const graph = report.dkg_graph;
+  if (!graph || typeof graph !== 'object' || !Array.isArray(graph.quads)) return [];
+  return graph.quads;
+}
+
 export async function analyzeMarketTool(args: {
   market_url: string;
   context_graph_id: string;
@@ -27,7 +37,8 @@ export async function analyzeMarketTool(args: {
       market_url: args.market_url,
     });
 
-    console.error(`[analyze_market] Got analysis result: risk_score=${analysis.risk_score}`);
+    const report = reportFromAnalysis(analysis);
+    console.error(`[analyze_market] Got analysis result: risk_score=${report.risk_score ?? analysis.risk_score ?? 0}`);
 
     // 2. Ingest to DKG
     await ingestToDkgTool({
@@ -37,10 +48,11 @@ export async function analyzeMarketTool(args: {
 
     const summary = `✓ **Market Analyzed**
 
-**Risk Score:** ${analysis.risk_score}/100
-**Suspicious Comments:** ${analysis.suspicious_comment_count}
-**Market Movers:** ${analysis.market_movers.length}
-**LunarCrush Amplification:** ${analysis.lunarcrush_overlap.amplification_score.toFixed(2)}
+**Risk Score:** ${report.risk_score ?? analysis.risk_score ?? 0}/100
+**Suspicious Comments:** ${report.suspicious_comment_count ?? analysis.suspicious_comment_count ?? 0}
+**Market Movers:** ${(report.market_movers ?? analysis.market_movers ?? []).length}
+**Graph Quads:** ${graphQuadsFromReport(report).length}
+**LunarCrush Amplification:** ${Number((report.lunarcrush_overlap ?? analysis.lunarcrush_overlap ?? {}).amplification_score ?? 0).toFixed(2)}
 
 Results ingested to your DKG Working Memory. You can:
 - Query them in SPARQL
@@ -84,6 +96,8 @@ export async function ingestToDkgTool(args: {
     );
 
     const assertionName = `polymarket-analysis-${args.analysis.market_id}-${Date.now()}`;
+    const report = reportFromAnalysis(args.analysis);
+    const graphQuads = graphQuadsFromReport(report);
 
     // Create assertion in Working Memory
     const result = await dkg.createAssertion({
@@ -95,11 +109,12 @@ export async function ingestToDkgTool(args: {
         '@type': 'PolymarketAnalysis',
         marketId: args.analysis.market_id,
         marketUrl: args.analysis.market_url,
-        riskScore: args.analysis.risk_score,
-        suspiciousCommentCount: args.analysis.suspicious_comment_count,
-        suspiciousComments: args.analysis.suspicious_comments,
-        marketMovers: args.analysis.market_movers,
-        lunarcrushOverlap: args.analysis.lunarcrush_overlap,
+        riskScore: report.risk_score ?? args.analysis.risk_score,
+        suspiciousCommentCount: report.suspicious_comment_count ?? args.analysis.suspicious_comment_count,
+        suspiciousComments: report.suspicious_comments ?? args.analysis.suspicious_comments ?? [],
+        marketMovers: report.market_movers ?? args.analysis.market_movers ?? [],
+        lunarcrushOverlap: report.lunarcrush_overlap ?? args.analysis.lunarcrush_overlap ?? {},
+        dkgGraphQuads: graphQuads,
         analyzedAt: args.analysis.analyzed_at,
       },
     });
