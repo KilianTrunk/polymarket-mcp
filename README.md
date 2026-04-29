@@ -1,4 +1,4 @@
-# @umanitek/polymarket-mcp
+# @kiliantrunk/polymarket-mcp
 
 **Polymarket Analysis Bot** — MCP server for DKG V10
 
@@ -37,12 +37,10 @@ The installer will:
 
 **Note:** API keys (POLYMARKET_API_KEY, LUNARCRUSH_API_KEY) are used by the EC2 service, not by this MCP. They're already configured on the service.
 
-### Via npm (once published)
-
-After `npm publish`:
+### Via npm
 
 ```bash
-npm install -g @umanitek/polymarket-mcp
+npm install -g @kiliantrunk/polymarket-mcp
 ```
 
 Set env vars:
@@ -83,7 +81,7 @@ Add to your MCP config:
   "mcpServers": {
     "polymarket": {
       "command": "npx",
-      "args": ["-y", "@umanitek/polymarket-mcp@latest"],
+      "args": ["-y", "@kiliantrunk/polymarket-mcp@latest"],
       "env": {
         "DKG_API_URL": "http://127.0.0.1:9200",
         "POLYMARKET_SERVICE_URL": "http://ec2-3-127-230-231.eu-central-1.compute.amazonaws.com:8000"
@@ -288,7 +286,7 @@ This package is registered in the [DKG Integrations Registry](https://github.com
   "install": {
     "kind": "mcp",
     "command": "npx",
-    "args": ["-y", "@umanitek/polymarket-mcp@latest"]
+    "args": ["-y", "@kiliantrunk/polymarket-mcp@latest"]
   },
   "envDefaults": {
     "DKG_API_URL": "http://127.0.0.1:9200",
@@ -308,7 +306,7 @@ dkg integrations add polymarket-analysis
 ```
 
 The DKG CLI will:
-1. Download latest @umanitek/polymarket-mcp from npm
+1. Download latest `@kiliantrunk/polymarket-mcp` from npm
 2. Configure the MCP to point to your local DKG node
 3. Set the analysis service endpoint to Umanitek's EC2
 4. Spawn the service automatically

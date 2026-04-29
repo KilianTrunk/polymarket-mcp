@@ -1,5 +1,5 @@
 {
-  "name": "@umanitek/polymarket-mcp",
+  "name": "@kiliantrunk/polymarket-mcp",
   "version": "1.0.0",
   "description": "Polymarket Analysis Bot — MCP server for DKG V10. Analyzes markets for coordination patterns and market manipulation, ingests findings into DKG Working Memory.",
   "type": "module",
@@ -51,7 +51,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/KilianTrunk/polymarket-mcp.git"
+    "url": "git+https://github.com/KilianTrunk/polymarket-mcp.git"
   },
   "bugs": {
     "url": "https://github.com/KilianTrunk/polymarket-mcp/issues"
