@@ -184,10 +184,6 @@ Writes analysis results to DKG (called automatically by `analyze_market`).
 
 **Note:** `POLYMARKET_API_KEY` and `LUNARCRUSH_API_KEY` are used by the EC2 service only, not by this MCP. They're already configured on the service.
 
-## Getting Started (Local Testing)
-
-See [E2E_TEST_GUIDE.md](../../docs/dkg-v10-polymarket-integration/E2E_TEST_GUIDE.md) for complete setup instructions to test locally with DKG V10.
-
 ## Development
 
 ### Build
@@ -335,11 +331,6 @@ MIT
 
 - **Repository**: https://github.com/KilianTrunk/polymarket-mcp
 - **Issues**: [GitHub Issues](https://github.com/KilianTrunk/polymarket-mcp/issues)
-- **Docs**: 
-  - [Complete E2E Testing Guide](https://github.com/KilianTrunk/umanitek-polymarket/blob/main/docs/dkg-v10-polymarket-integration/E2E_TEST_GUIDE.md)
-  - [Umanitek Integration Guide](https://github.com/KilianTrunk/umanitek-polymarket/tree/main/docs/dkg-v10-polymarket-integration)
-  - [API Deployment Details](https://github.com/KilianTrunk/umanitek-polymarket/blob/main/docs/API_DEPLOYMENT.md)
-
 - **API Service**: http://ec2-3-127-230-231.eu-central-1.compute.amazonaws.com:8000
   - Health check: `GET /health`
   - Analyze endpoint: `POST /analyze`
@@ -365,4 +356,4 @@ You can then:
 
 ---
 
-**Built for DKG V10.** Production-ready. [Get started →](../../docs/dkg-v10-polymarket-integration/E2E_TEST_GUIDE.md)
+**Built for DKG V10.** Production-ready.
