@@ -12,8 +12,54 @@ export interface CreateAssertionParams {
 
 export interface CreateAssertionResponse {
   assertionUri: string;
-  assertionName: string;
+  assertionName?: string;
   contextGraphId: string;
+}
+
+interface AssertionLookupResponse {
+  assertionUri?: string;
+  uri?: string;
+}
+
+interface Quad {
+  subject: string;
+  predicate: string;
+  object: string;
+  graph: string;
+}
+
+const POLYMARKET_ONTOLOGY = 'http://dkg.io/ontology/polymarket/';
+
+function literal(value: unknown): string {
+  return JSON.stringify(typeof value === 'string' ? value : JSON.stringify(value));
+}
+
+function iriPart(value: string): string {
+  const sanitized = value.toLowerCase().replace(/[^a-z0-9_-]+/g, '-').replace(/^-+|-+$/g, '');
+  return sanitized || 'analysis';
+}
+
+function contentToQuads(subject: string, content: Record<string, any>): Quad[] {
+  const quads: Quad[] = [
+    {
+      subject,
+      predicate: 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type',
+      object: `${POLYMARKET_ONTOLOGY}PolymarketAnalysis`,
+      graph: '',
+    },
+  ];
+
+  const skipKeys = new Set(['@context', '@id', '@type']);
+  for (const [key, value] of Object.entries(content)) {
+    if (skipKeys.has(key) || value === undefined || value === null) continue;
+    quads.push({
+      subject,
+      predicate: `${POLYMARKET_ONTOLOGY}${key}`,
+      object: literal(value),
+      graph: '',
+    });
+  }
+  return quads;
 }
 
 export class DkgClient {
@@ -31,7 +77,10 @@ export class DkgClient {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(params),
+      body: JSON.stringify({
+        contextGraphId: params.context,
+        name: params.name,
+      }),
     });
 
     if (!response.ok) {
@@ -41,7 +90,34 @@ export class DkgClient {
       );
     }
 
-    return await response.json();
+    const result = await response.json() as CreateAssertionResponse;
+    const subject = typeof params.content['@id'] === 'string'
+      ? params.content['@id']
+      : `urn:dkg:polymarket-analysis:${iriPart(params.name)}`;
+    const writeUrl = `${this.apiUrl}/api/assertion/${encodeURIComponent(params.name)}/write`;
+    const writeResponse = await fetch(writeUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contextGraphId: params.context,
+        quads: contentToQuads(subject, params.content),
+      }),
+    });
+
+    if (!writeResponse.ok) {
+      const errorText = await writeResponse.text();
+      throw new Error(
+        `DKG assertion write failed: ${writeResponse.status} ${writeResponse.statusText}. ${errorText}`
+      );
+    }
+
+    return {
+      assertionUri: result.assertionUri,
+      assertionName: params.name,
+      contextGraphId: params.context,
+    };
   }
 
   async getAssertionUri(assertionName: string, contextGraphId: string): Promise<string> {
@@ -58,7 +134,11 @@ export class DkgClient {
       throw new Error(`Failed to fetch assertion: ${response.status} ${response.statusText}`);
     }
 
-    const data = await response.json();
-    return data.assertionUri || data.uri;
+    const data = await response.json() as AssertionLookupResponse;
+    const assertionUri = data.assertionUri || data.uri;
+    if (!assertionUri) {
+      throw new Error('Assertion response did not include an assertion URI');
+    }
+    return assertionUri;
   }
 }
